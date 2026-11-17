@@ -52,6 +52,49 @@ def statistical_test(file_name: str ) -> dict:
                 print(f"Invalid target column. Please choose from: {', '.join(data.columns)}")
                 continue
 
+            # Test whether the target variable is continuous or categorical
+            if pd.api.types.is_numeric_dtype(data[target_column]):
+                target_type = 'continuous'
+                print(f"The target variable '{target_column}' is identified as {target_type}.")
+                confirm = input("Is this correct? 'yes' to confirm target column / 'no' to re-enter): ").strip().lower()
+                if confirm == 'no':
+                    print("Please choose a different target variable column.")
+                    continue
+                elif confirm == 'yes':
+                    print(f"The target variable '{target_column}' is confirmed as {target_type}.")
+                    break
+                else:
+                    print("Invalid input. Please enter 'yes' or 'no'.")
+                    continue
+            elif pd.api.types.is_datetime64_any_dtype(data[target_column]):
+                target_type = 'continuous - datetime'
+                print(f"The target variable '{target_column}' is identified as {target_type}. This is not a valid target variable for statistical testing. Please choose a different column.")
+                continue
+            elif (pd.api.types.is_bool_dtype(data[target_column])
+                or isinstance(data[target_column].dtype, pd.CategoricalDtype)
+                or pd.api.types.is_object_dtype(data[target_column])
+                or pd.api.types.is_string_dtype(data[target_column])):
+                target_type = 'categorical'
+                print(f"The target variable '{target_column}' is identified as {target_type}.")
+                target_unique_values = data[target_column].unique()
+                count_unique_values = len(target_unique_values)
+                if count_unique_values > 15:
+                    print(f"The target variable '{target_column}' is identified as {target_type} with {count_unique_values} unique values. This may not be suitable for statistical testing. Please choose a different column.")
+                    continue
+                else:
+                    print(f"Unique values in '{target_column}': {', '.join(target_unique_values)}")
+                    confirm = input("Is this correct? 'yes' to confirm target column / 'no' to re-enter): ").strip().lower()
+                    if confirm == 'no':
+                        print("Please choose a different target variable column.")
+                        continue
+                    elif confirm == 'yes':
+                        print(f"The target variable '{target_column}' is confirmed as {target_type}.")
+                        break
+            else:
+                target_type = 'unknown'
+                print(f"The target variable '{target_column}' is identified as {target_type}. Please choose a different column.")
+                continue
+
             break
 
     # after selecting the target column we can remove it from the list of independent columns
@@ -106,6 +149,7 @@ def statistical_test(file_name: str ) -> dict:
             else:
                 print("Please choose a different independent variable column.")
                 continue
+
 
 
 
