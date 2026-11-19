@@ -150,7 +150,18 @@ def statistical_test(file_name: str ) -> dict:
                 print("Please choose a different independent variable column.")
                 continue
 
-
+    if target_type == 'continuous':
+        # perform a normility test on the target variable
+        print(f"Performing Shapiro-Wilk normality test on the target variable '{target_column}'...")
+        print("H0: The data is normally distributed. H1: The data is not normally distributed.")
+        shapiro_test_statistic, shapiro_p_value = stats.shapiro(data[target_column])
+        if shapiro_p_value > 0.05:
+            print(f"The p-value = {shapiro_p_value:.4f}). At a significance level of 0.05, we fail to reject the null hypothesis. The data is normally distributed.")
+        else:
+            print(f"The p-value = {shapiro_p_value:.4f}). At a significance level of 0.05, we reject the null hypothesis. The data is not normally distributed.")
+        print(f"Here is a histogram and a Q-Q plot of the target variable '{target_column}' to visually assess normality.")
+        
+            
 
 
 
